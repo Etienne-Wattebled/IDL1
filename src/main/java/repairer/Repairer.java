@@ -8,15 +8,23 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import spoon.processing.AbstractProcessor;
-
 public class Repairer {
 	private List<String> operatorNames;
 	private Iterator<String> currentOperator;
+	private String path;
+	private LinkedList<File> javaFiles;
 	
-	public Repairer() {
+	
+	/**
+	 * @param path The root path of the project to repare which ends with "/"
+	 * The project to repare must have src/main/java.
+	 */
+	public Repairer(String path) {
+		this.path = path;
 		resetOperatorNames();
 		resetCurrent();
+		javaFiles = new LinkedList<File>();
+		fillJavaFiles(new File(path + "/src/main/java/"));
 	}
 	
 	private void resetCurrent() {
@@ -39,12 +47,26 @@ public class Repairer {
 		}
 	}
 	
+	private void fillJavaFiles(File file) {
+		if (file.isFile()) {
+			if (file.toString().contains(".java")) {
+				javaFiles.add(file);
+			}
+		}
+		if (file.isDirectory()) {
+			File files[] = file.listFiles();
+			for (File f : files) {
+				fillJavaFiles(f);
+			}
+		}
+	}
+	
 	public void repair() {
 			boolean continueToRepare;
-			boolean hasNextOperator;
+			boolean hasNextOperator;			
 	}
 	
 	public static void main(String args[]) {
-		
+		new Repairer("E:/Utilisateurs/Étienne/Documents/workspace/Titi/");
 	}
 }
