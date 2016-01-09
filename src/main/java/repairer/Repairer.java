@@ -13,7 +13,7 @@ public class Repairer {
 	private Iterator<String> currentOperator;
 	private String path;
 	private LinkedList<File> javaFiles;
-	
+	private LinkedList<File> javaTestFiles;
 	
 	/**
 	 * @param path The root path of the project to repare which ends with "/"
@@ -24,7 +24,9 @@ public class Repairer {
 		resetOperatorNames();
 		resetCurrent();
 		javaFiles = new LinkedList<File>();
-		fillJavaFiles(new File(path + "/src/main/java/"));
+		javaTestFiles = new LinkedList<File>();
+		findJavaFiles(new File(path + "/src/main/java/"),javaFiles);
+		findJavaFiles(new File(path + "/src/test/java"),javaTestFiles);
 	}
 	
 	private void resetCurrent() {
@@ -47,23 +49,23 @@ public class Repairer {
 		}
 	}
 	
-	private void fillJavaFiles(File file) {
+	private void findJavaFiles(File file, LinkedList<File> list) {
 		if (file.isFile()) {
 			if (file.toString().contains(".java")) {
-				javaFiles.add(file);
+				list.add(file);
 			}
 		}
 		if (file.isDirectory()) {
 			File files[] = file.listFiles();
 			for (File f : files) {
-				fillJavaFiles(f);
+				findJavaFiles(f,list);
 			}
 		}
 	}
 	
 	public void repair() {
-			boolean continueToRepare;
-			boolean hasNextOperator;			
+		boolean continueToRepare;
+		boolean hasNextOperator;			
 	}
 	
 	public static void main(String args[]) {
