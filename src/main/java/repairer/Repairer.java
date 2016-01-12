@@ -34,12 +34,9 @@ public class Repairer {
 		this.src_test_javaFiles = new LinkedList<File>();
 			
 		this.findFiles(new File(path + Constants.SRC_CLASSES_PATH),this.src_main_javaFiles,".java");
-		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.src_test_javaFiles,".java");
-
-		
+		this.findFiles(new File(path + Constants.SRC_TESTCLASSES_PATH),this.src_test_javaFiles,".java");		
 		
 		// Create javac output folders.
-		
 		File target_classes = new File(this.path + Constants.TARGET_CLASSES_PATH);
 		target_classes.mkdirs();
 		
@@ -56,15 +53,15 @@ public class Repairer {
 		sb = new StringBuilder();
 		
 		for (File f : this.src_main_javaFiles) {
-			sb.append("javac ").append(f.getName()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
 			
 			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
 		}
 		
 		// Compilation of /target/test-classes
-		for (File f : this.src_main_javaFiles) {
-			sb.append("javac ").append(f.getName()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
+		for (File f : this.src_test_javaFiles) {
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
 			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
 		}
