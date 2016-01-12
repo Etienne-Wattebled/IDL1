@@ -18,52 +18,59 @@ public class Repairer {
 	private LinkedList<File> target_classesFiles;
 	private LinkedList<File> target_testClassesFiles;
 	
+
 	/**
 	 * @param path The root path of the project to repare which ends with "/"
 	 * The project to repare must have src/main/java.
 	 */
 	public Repairer(String path) {
 		this.path = path;
-		resetOperatorNames();
-		resetCurrent();
-		target_classesFiles = new LinkedList<File>();
-		target_testClassesFiles = new LinkedList<File>();
+		this.resetOperatorNames();
+		this.resetCurrent();
+		this.target_classesFiles = new LinkedList<File>();
+		this.target_testClassesFiles = new LinkedList<File>();
 				
 		// Create javac output folders.
 		
-		File target_classes = new File(path + "target\\classes\\");
-		System.out.println(target_classes.mkdirs());
+		File target_classes = new File(this.path + Constants.TARGET_CLASSES_PATH);
+		target_classes.mkdirs();
 		
-		File target_testClasses = new File(path + "target\\test-classes\\");
-		System.out.println(target_testClasses.mkdirs());
+		File target_testClasses = new File(this.path + Constants.TARGET_TESTCLASSES_PATH);
+		target_testClasses.mkdirs();
 		
 		// Compilation
 		try {
 			Runtime runtime = Runtime.getRuntime();
 			StringBuilder sb = null;
 			
+			
+			this.findJavaFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles);
+			this.findJavaFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles);
+			Process process = null;
+			
 			// Compilation of /target/classes/
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src\\main\\java\\*.java -d ").append(path).append("target\\classes\\");
-			System.out.println(sb.toString());
-			
-			Process process = null;
-			process = runtime.exec(sb.toString());
-			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			Iterator<File> it = null;			
+			it = target_classesFiles.iterator();
+			while (it.hasNext()) {
+				sb.append("javac ").append(this.path).append(Constants.SRC_CLASSES_PATH).append(it.next().getPath()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
+				process = runtime.exec(sb.toString());
+				try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			}			
 			
 			// Compilation of /target/test-classes
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src\\test\\java\\*.java -d ").append(path).append("target\\test-classes\\");
-			System.out.println(sb.toString());
-			
-			process = runtime.exec(sb.toString());
-			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			it = target_testClassesFiles.iterator();
+			while (it.hasNext()) {
+				sb.append("javac ").append(this.path).append(Constants.SRC_TESTCLASSES_PATH).append(it.next().getPath()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
+				process = runtime.exec(sb.toString());
+				try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			}
 			
 		} catch (IOException ie) {
 			ie.printStackTrace();
 		}
-		findJavaFiles(new File(path + "target/classes/"),target_classesFiles);
-		findJavaFiles(new File(path + "target/test-classes/"),target_testClassesFiles);
+		
 	}
 	
 	private void resetCurrent() {
@@ -106,6 +113,6 @@ public class Repairer {
 	}
 	
 	public static void main(String args[]) {
-		new Repairer("~\\workspace\\TITI\\");
+		new Repairer("\\home\\m2iagl\\wattebled\\workspace\\TITI\\");
 	}
 }
