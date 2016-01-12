@@ -27,9 +27,9 @@ public class Repairer {
 		target_testClassesFiles = new LinkedList<File>();
 				
 		// Create javac output folders.
-		File target_classes = new File("/target/classes");
+		File target_classes = new File(path + "target/classes/");
 		target_classes.mkdirs();
-		File target_testClasses = new File("/target/test-classes/");
+		File target_testClasses = new File(path + "target/test-classes/");
 		target_testClasses.mkdirs();	
 		
 		// Compilation
@@ -39,7 +39,7 @@ public class Repairer {
 			
 			// Compilation of /target/classes/
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src/main/java/* -d ").append(path).append("target/classes/");
+			sb.append("javac ").append(path).append("src/main/java/*.java -d ").append(path).append("target/classes/");
 			System.out.println(sb.toString());
 			
 			Process p = null;
@@ -48,7 +48,7 @@ public class Repairer {
 			
 			// Compilation of /target/test-classes
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src/test/java/* -d ").append(path).append("target/test-classes/");
+			sb.append("javac ").append(path).append("src/test/java/*.java -d ").append(path).append("target/test-classes/");
 			System.out.println(sb.toString());
 			
 			p = runtime.exec(sb.toString());
