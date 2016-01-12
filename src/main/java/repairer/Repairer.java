@@ -12,8 +12,8 @@ public class Repairer {
 	private List<String> operatorNames;
 	private Iterator<String> currentOperator;
 	private String path;
-	private LinkedList<File> javaFiles;
-	private LinkedList<File> javaTestFiles;
+	private LinkedList<File> target_classesFiles;
+	private LinkedList<File> target_testClassesFiles;
 	
 	/**
 	 * @param path The root path of the project to repare which ends with "/"
@@ -23,10 +23,42 @@ public class Repairer {
 		this.path = path;
 		resetOperatorNames();
 		resetCurrent();
-		javaFiles = new LinkedList<File>();
-		javaTestFiles = new LinkedList<File>();
-		findJavaFiles(new File(path + "/src/main/java/"),javaFiles);
-		findJavaFiles(new File(path + "/src/test/java"),javaTestFiles);
+		target_classesFiles = new LinkedList<File>();
+		target_testClassesFiles = new LinkedList<File>();
+				
+		// Create javac output folders.
+		File target_classes = new File("/target/classes");
+		target_classes.mkdirs();
+		File target_testClasses = new File("/target/test-classes/");
+		target_testClasses.mkdirs();	
+		
+		// Compilation
+		try {
+			Runtime runtime = Runtime.getRuntime();
+			StringBuilder sb = null;
+			
+			// Compilation of /target/classes/
+			sb = new StringBuilder();
+			sb.append("javac ").append(path).append("src/main/java/* -d ").append(path).append("target/classes/");
+			System.out.println(sb.toString());
+			
+			Process p = null;
+			p = runtime.exec(sb.toString());
+			try { p.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			
+			// Compilation of /target/test-classes
+			sb = new StringBuilder();
+			sb.append("javac ").append(path).append("src/test/java/* -d ").append(path).append("target/test-classes/");
+			System.out.println(sb.toString());
+			
+			p = runtime.exec(sb.toString());
+			try { p.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			
+		} catch (IOException ie) {
+			ie.printStackTrace();
+		}
+		findJavaFiles(new File(path + "target/classes/"),target_classesFiles);
+		findJavaFiles(new File(path + "target/test-classes/"),target_testClassesFiles);
 	}
 	
 	private void resetCurrent() {
@@ -51,7 +83,7 @@ public class Repairer {
 	
 	private void findJavaFiles(File file, LinkedList<File> list) {
 		if (file.isFile()) {
-			if (file.toString().contains(".java")) {
+			if (file.toString().contains(".class")) {
 				list.add(file);
 			}
 		}
@@ -69,6 +101,6 @@ public class Repairer {
 	}
 	
 	public static void main(String args[]) {
-		new Repairer("E:/Utilisateurs/Étienne/Documents/workspace/Titi/");
+		new Repairer("~/workspace/TITI/");
 	}
 }
