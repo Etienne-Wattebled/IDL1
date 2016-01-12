@@ -39,38 +39,26 @@ public class Repairer {
 		target_testClasses.mkdirs();
 		
 		// Compilation
-		try {
-			Runtime runtime = Runtime.getRuntime();
-			StringBuilder sb = null;
-			
-			
-			this.findJavaFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles);
-			this.findJavaFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles);
-			Process process = null;
-			
-			// Compilation of /target/classes/
-			sb = new StringBuilder();
-			Iterator<File> it = null;			
-			it = target_classesFiles.iterator();
-			while (it.hasNext()) {
-				sb.append("javac ").append(this.path).append(Constants.SRC_CLASSES_PATH).append(it.next().getPath()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
-				process = runtime.exec(sb.toString());
-				try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
-			}			
-			
-			// Compilation of /target/test-classes
-			sb = new StringBuilder();
-			it = target_testClassesFiles.iterator();
-			while (it.hasNext()) {
-				sb.append("javac ").append(this.path).append(Constants.SRC_TESTCLASSES_PATH).append(it.next().getPath()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
-				process = runtime.exec(sb.toString());
-				try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
-			}
-			
-		} catch (IOException ie) {
-			ie.printStackTrace();
-		}
+		Runtime runtime = Runtime.getRuntime();
+		StringBuilder sb = null;
 		
+		Process process = null;
+
+		// Compilation of /target/classes/
+		sb = new StringBuilder();
+		
+		sb.append("javac ").append(this.path).append(Constants.SRC_CLASSES_PATH).append("*.java").append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
+		
+		try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+		try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
+		
+		// Compilation of /target/test-classes
+		sb.append("javac ").append(this.path).append(Constants.SRC_TESTCLASSES_PATH).append("*.java").append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
+		try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+		try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+		
+		this.findJavaFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles);
+		this.findJavaFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles);
 	}
 	
 	private void resetCurrent() {
@@ -113,6 +101,6 @@ public class Repairer {
 	}
 	
 	public static void main(String args[]) {
-		new Repairer("\\home\\m2iagl\\wattebled\\workspace\\TITI\\");
+		new Repairer("C:\\IDLtmp\\IntroClassJava\\dataset\\checksum\\2c1556672751734adf9a561fbf88767c32224fca14a81e9d9c719f18d0b21765038acc16ecd8377f74d4f43e8c844538161d869605e3516cf797d0a6a59f1f8e\\003\\");
 	}
 }
