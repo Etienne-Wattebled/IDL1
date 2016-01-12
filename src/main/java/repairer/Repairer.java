@@ -33,8 +33,8 @@ public class Repairer {
 		this.src_main_javaFiles = new LinkedList<File>();
 		this.src_test_javaFiles = new LinkedList<File>();
 			
-		this.findJavaFiles(new File(path + Constants.SRC_CLASSES_PATH),this.src_main_javaFiles,".java");
-		this.findJavaFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.src_test_javaFiles,".java");
+		this.findFiles(new File(path + Constants.SRC_CLASSES_PATH),this.src_main_javaFiles,".java");
+		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.src_test_javaFiles,".java");
 
 		
 		
@@ -65,8 +65,8 @@ public class Repairer {
 		try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 		try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
 		
-		this.findJavaFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles,".class");
-		this.findJavaFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles,".class");
+		this.findFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles,".class");
+		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles,".class");
 	}
 	
 	private void resetCurrent() {
@@ -89,16 +89,16 @@ public class Repairer {
 		}
 	}
 	
-	private void findJavaFiles(File file, LinkedList<File> list, String end) {
+	private void findFiles(File file, LinkedList<File> list, String part) {
 		if (file.isFile()) {
-			if (file.toString().contains(end)) {
+			if (file.toString().contains(part)) {
 				list.add(file);
 			}
 		}
 		if (file.isDirectory()) {
 			File files[] = file.listFiles();
 			for (File f : files) {
-				findJavaFiles(f,list,end);
+				findFiles(f,list,part);
 			}
 		}
 	}
