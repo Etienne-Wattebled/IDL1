@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,10 +30,12 @@ public class Repairer {
 		target_testClassesFiles = new LinkedList<File>();
 				
 		// Create javac output folders.
-		File target_classes = new File(path + "target/classes/");
-		target_classes.mkdirs();
-		File target_testClasses = new File(path + "target/test-classes/");
-		target_testClasses.mkdirs();	
+		
+		File target_classes = new File(path + "target\\classes\\");
+		System.out.println(target_classes.mkdirs());
+		
+		File target_testClasses = new File(path + "target\\test-classes\\");
+		System.out.println(target_testClasses.mkdirs());
 		
 		// Compilation
 		try {
@@ -39,20 +44,20 @@ public class Repairer {
 			
 			// Compilation of /target/classes/
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src/main/java/*.java -d ").append(path).append("target/classes/");
+			sb.append("javac ").append(path).append("src\\main\\java\\*.java -d ").append(path).append("target\\classes\\");
 			System.out.println(sb.toString());
 			
-			Process p = null;
-			p = runtime.exec(sb.toString());
-			try { p.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			Process process = null;
+			process = runtime.exec(sb.toString());
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
 			
 			// Compilation of /target/test-classes
 			sb = new StringBuilder();
-			sb.append("javac ").append(path).append("src/test/java/*.java -d ").append(path).append("target/test-classes/");
+			sb.append("javac ").append(path).append("src\\test\\java\\*.java -d ").append(path).append("target\\test-classes\\");
 			System.out.println(sb.toString());
 			
-			p = runtime.exec(sb.toString());
-			try { p.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+			process = runtime.exec(sb.toString());
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
 			
 		} catch (IOException ie) {
 			ie.printStackTrace();
@@ -101,6 +106,6 @@ public class Repairer {
 	}
 	
 	public static void main(String args[]) {
-		new Repairer("~/workspace/TITI/");
+		new Repairer("~\\workspace\\TITI\\");
 	}
 }
