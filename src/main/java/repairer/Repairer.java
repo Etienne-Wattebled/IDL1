@@ -55,15 +55,19 @@ public class Repairer {
 		// Compilation of /target/classes/
 		sb = new StringBuilder();
 		
-		sb.append("javac ").append(this.path).append(Constants.SRC_CLASSES_PATH).append("*.java").append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
-		
-		try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
-		try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
+		for (File f : this.src_main_javaFiles) {
+			sb.append("javac ").append(f.getName()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
+			
+			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
+		}
 		
 		// Compilation of /target/test-classes
-		sb.append("javac ").append(this.path).append(Constants.SRC_TESTCLASSES_PATH).append("*.java").append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
-		try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
-		try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+		for (File f : this.src_main_javaFiles) {
+			sb.append("javac ").append(f.getName()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
+			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+		}
 		
 		this.findFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles,".class");
 		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles,".class");
