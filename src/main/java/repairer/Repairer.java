@@ -21,6 +21,8 @@ import org.junit.runner.Result;
 import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
+import metamutator.MutantSearchSpaceExplorator;
+
 public class Repairer {
 	private List<String> operatorNames;
 	private Iterator<String> currentOperator;
@@ -32,7 +34,8 @@ public class Repairer {
 	private int totalStartFailures;
 	private JUnitCore jUnitCore;
 	/**
-	 * @param path The root path of the project to repare which ends with "/"
+	 * @param path The root path of the project to repare which ends with "\\"
+	 * All "/" must be "\\"
 	 * The project to repare must have src/main/java.
 	 */
 	public Repairer(String path) {
@@ -56,36 +59,13 @@ public class Repairer {
 		File target_testClasses = new File(this.path + Constants.TARGET_TESTCLASSES_PATH);
 		target_testClasses.mkdirs();
 		
-		// Compilation
-		Runtime runtime = Runtime.getRuntime();
-		StringBuilder sb = null;
-		
-		Process process = null;
-
-		// Compilation of /target/classes/
-		sb = new StringBuilder();
-		
-		for (File f : this.src_main_javaFiles) {
-			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
-				.append(Constants.TARGET_CLASSES_PATH);
-			
-			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
-			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
-		}
-		
-		// Compilation of /target/test-classes
-		for (File f : this.src_test_javaFiles) {
-			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
-				.append(Constants.TARGET_TESTCLASSES_PATH).append(" -cp ").append(Constants.SRC_MAIN_RESOURCES_PATH)
-				.append(Constants.JUNIT_JAR_NAME);
-			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
-			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
-		}
+		this.compileClasses();
 		
 		this.findFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles,".class");
 		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles,".class");
 
 		Result result = runTests();
+		
 		this.totalStartFailures = result.getFailureCount();
 		System.out.println(this.totalStartFailures);
 	}
@@ -108,7 +88,7 @@ public class Repairer {
 				dir = f.getParentFile();
 				url = dir.toURI().toURL();
 				ucl = new URLClassLoader(new URL[] { url });
-				classes[i] = ucl.loadClass(f.getName().replace(".class",""));
+				classes[i] = ucl.loadClass(getPathAfter(f.getAbsolutePath(),Constants.TARGET_TESTCLASSES_PATH) + f.getName().replace(".class",""));
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
@@ -119,6 +99,12 @@ public class Repairer {
 		
 		return JUnitCore.runClasses(classes);
 	}
+	
+	public static String getPathAfter(String path, String flag) {
+		// +1 in order to eliminate the \\ at the beginning
+		return path.substring(path.lastIndexOf(flag)+flag.length()+1);
+	}
+	
 	private void resetOperatorNames() {
 		this.operatorNames = new LinkedList<String>();
 		try {
@@ -152,6 +138,33 @@ public class Repairer {
 	public void repair() {
 		boolean continueToRepare;
 		boolean hasNextOperator;			
+	}
+	
+	private void compileClasses() {
+		// Compilation
+		Runtime runtime = Runtime.getRuntime();
+		Process process = null;
+		
+		// Compilation of /target/classes/
+		StringBuilder sb = null;
+		sb = new StringBuilder();
+		
+		for (File f : this.src_main_javaFiles) {
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
+				.append(Constants.TARGET_CLASSES_PATH);
+			
+			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
+		}
+		
+		// Compilation of /target/test-classes
+		for (File f : this.src_test_javaFiles) {
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
+				.append(Constants.TARGET_TESTCLASSES_PATH).append(" -cp ").append(Constants.SRC_MAIN_RESOURCES_PATH)
+				.append(Constants.JUNIT_JAR_NAME);
+			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
+			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
+		}
 	}
 	
 	public static void main(String args[]) {
