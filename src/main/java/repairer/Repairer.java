@@ -95,29 +95,34 @@ public class Repairer {
 	}
 	
 	private Result runTests() {
-		LinkedList<URL> urls = new LinkedList<URL>();
+		URL[] urls = new URL[this.target_testClassesFiles.size()];
+		Class[] classes = new Class[this.target_testClassesFiles.size()];
+		int i = 0;
 		URL url = null;
 		File dir = null;
+		
 		for (File f : this.target_testClassesFiles) {
 			try {
 				dir = f.getParentFile();
 				url = new URL("file://"+f.getAbsolutePath());
-				urls.add(url);
+				urls[i] = url;
+				i = i+1;
 			} catch (MalformedURLException me) {
 				me.printStackTrace();
 			}
 		}
-		URLClassLoader ucl = new URLClassLoader((URL[]) urls.toArray());
-		LinkedList<Class<?>> list = new LinkedList<Class<?>>();
+		URLClassLoader ucl = new URLClassLoader(urls);
+		i = 0;
 		for (File f : this.target_testClassesFiles) {
 			try {
-				list.add(ucl.loadClass(f.getName()));
+				classes[i] = ucl.loadClass(f.getAbsolutePath());
+				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
 			}
 		}
 		
-		return JUnitCore.runClasses((Class<?>[]) list.toArray());
+		return JUnitCore.runClasses(classes);
 	}
 	private void resetOperatorNames() {
 		this.operatorNames = new LinkedList<String>();
