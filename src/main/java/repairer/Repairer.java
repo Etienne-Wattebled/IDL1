@@ -63,7 +63,7 @@ public class Repairer {
 		// Compilation of /target/test-classes
 		for (File f : this.src_test_javaFiles) {
 			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
-				.append(Constants.TARGET_TESTCLASSES_PATH).append("-cp ").append(Constants.SRC_MAIN_RESOURCES_PATH)
+				.append(Constants.TARGET_TESTCLASSES_PATH).append(" -cp ").append(Constants.SRC_MAIN_RESOURCES_PATH)
 				.append(Constants.JUNIT_JAR_NAME);
 			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
