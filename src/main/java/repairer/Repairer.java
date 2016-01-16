@@ -4,12 +4,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.junit.runner.Description;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Request;
+import org.junit.runner.Result;
+import org.junit.runner.Runner;
+import org.junit.runner.notification.RunNotifier;
 
 public class Repairer {
 	private List<String> operatorNames;
@@ -19,7 +29,8 @@ public class Repairer {
 	private LinkedList<File> target_testClassesFiles;
 	private LinkedList<File> src_main_javaFiles;
 	private LinkedList<File> src_test_javaFiles;
-
+	private int totalStartFailures;
+	private JUnitCore jUnitCore;
 	/**
 	 * @param path The root path of the project to repare which ends with "/"
 	 * The project to repare must have src/main/java.
@@ -32,7 +43,9 @@ public class Repairer {
 		this.target_testClassesFiles = new LinkedList<File>();
 		this.src_main_javaFiles = new LinkedList<File>();
 		this.src_test_javaFiles = new LinkedList<File>();
-			
+		this.totalStartFailures = 0;
+		this.jUnitCore = new JUnitCore();
+		
 		this.findFiles(new File(path + Constants.SRC_CLASSES_PATH),this.src_main_javaFiles,".java");
 		this.findFiles(new File(path + Constants.SRC_TESTCLASSES_PATH),this.src_test_javaFiles,".java");		
 		
@@ -71,12 +84,41 @@ public class Repairer {
 		
 		this.findFiles(new File(path + Constants.TARGET_CLASSES_PATH),this.target_classesFiles,".class");
 		this.findFiles(new File(path + Constants.TARGET_TESTCLASSES_PATH),this.target_testClassesFiles,".class");
+
+		Result result = runTests();
+		this.totalStartFailures = result.getFailureCount();
+		System.out.println(this.totalStartFailures);
 	}
 	
 	private void resetCurrent() {
 		this.currentOperator = this.operatorNames.iterator();
 	}
 	
+	private Result runTests() {
+		LinkedList<URL> urls = new LinkedList<URL>();
+		URL url = null;
+		File dir = null;
+		for (File f : this.target_testClassesFiles) {
+			try {
+				dir = f.getParentFile();
+				url = new URL("file://"+f.getAbsolutePath());
+				urls.add(url);
+			} catch (MalformedURLException me) {
+				me.printStackTrace();
+			}
+		}
+		URLClassLoader ucl = new URLClassLoader((URL[]) urls.toArray());
+		LinkedList<Class<?>> list = new LinkedList<Class<?>>();
+		for (File f : this.target_testClassesFiles) {
+			try {
+				list.add(ucl.loadClass(f.getName()));
+			} catch (ClassNotFoundException cnfe) {
+				cnfe.printStackTrace();
+			}
+		}
+		
+		return JUnitCore.runClasses((Class<?>[]) list.toArray());
+	}
 	private void resetOperatorNames() {
 		this.operatorNames = new LinkedList<String>();
 		try {
