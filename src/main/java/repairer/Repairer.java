@@ -82,6 +82,7 @@ public class Repairer {
 		URL url = null;
 		File dir = null;
 		URLClassLoader ucl = null;
+		String temp = null;
 		
 		i = 0;
 		for (File f : this.target_testClassesFiles) {
@@ -89,7 +90,12 @@ public class Repairer {
 				dir = f.getParentFile();
 				url = dir.toURI().toURL();
 				ucl = new URLClassLoader(new URL[] { url });
-				classes[i] = ucl.loadClass(PathUtils.getPathAfter(PathUtils.getPathWithoutExtension(f.getAbsolutePath()),Constants.TARGET_TESTCLASSES_PATH).replaceAll("/",".").replaceAll("\\","."));
+				temp = f.getAbsolutePath();
+				temp = PathUtils.getPathWithoutExtension(temp);
+				temp = temp.replaceAll("/",".");
+				temp = temp.replaceAll("\\",".");
+				temp = PathUtils.getPathAfter(temp,Constants.TARGET_TESTCLASSES_PATH);
+				classes[i] = ucl.loadClass(temp);
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
