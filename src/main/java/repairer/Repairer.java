@@ -53,7 +53,8 @@ public class Repairer {
 		sb = new StringBuilder();
 		
 		for (File f : this.src_main_javaFiles) {
-			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path).append(Constants.TARGET_CLASSES_PATH);
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
+				.append(Constants.TARGET_CLASSES_PATH);
 			
 			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }		
@@ -61,7 +62,9 @@ public class Repairer {
 		
 		// Compilation of /target/test-classes
 		for (File f : this.src_test_javaFiles) {
-			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path).append(Constants.TARGET_TESTCLASSES_PATH);
+			sb.append("javac ").append(f.getAbsolutePath()).append(" -d ").append(this.path)
+				.append(Constants.TARGET_TESTCLASSES_PATH).append("-cp ").append(Constants.SRC_MAIN_RESOURCES_PATH)
+				.append(Constants.JUNIT_JAR_NAME);
 			try { process = runtime.exec(sb.toString()); } catch (IOException ie) { ie.printStackTrace(); };
 			try { process.waitFor(); } catch (InterruptedException ie) { ie.printStackTrace(); }
 		}
@@ -77,7 +80,7 @@ public class Repairer {
 	private void resetOperatorNames() {
 		this.operatorNames = new LinkedList<String>();
 		try {
-			FileReader fr = new FileReader("./src/main/java/resources/operators.txt");
+			FileReader fr = new FileReader(Constants.SRC_MAIN_RESOURCES_PATH + Constants.OPERATORS_NAME);
 			BufferedReader br = new BufferedReader(fr);
 			String name = null;
 			while ((name = br.readLine()) != null) {
