@@ -115,7 +115,7 @@ public class Repairer {
 		i = 0;
 		for (File f : this.target_testClassesFiles) {
 			try {
-				classes[i] = ucl.loadClass(f.getAbsolutePath());
+				classes[i] = ucl.loadClass(f.getAbsolutePath().replace(";class",""));
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
