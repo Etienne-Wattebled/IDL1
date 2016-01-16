@@ -108,7 +108,7 @@ public class Repairer {
 				dir = f.getParentFile();
 				url = dir.toURI().toURL();
 				ucl = new URLClassLoader(new URL[] { url });
-				classes[i] = ucl.loadClass(f.getName());
+				classes[i] = ucl.loadClass(f.getName().replace(".class",""));
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
