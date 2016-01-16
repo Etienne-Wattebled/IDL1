@@ -101,8 +101,7 @@ public class Repairer {
 	}
 	
 	public static String getPathAfter(String path, String flag) {
-		// +1 in order to eliminate the \\ at the beginning
-		return path.substring(path.lastIndexOf(flag)+flag.length()+1);
+		return path.substring(path.lastIndexOf(flag)+flag.length());
 	}
 	
 	private void resetOperatorNames() {
