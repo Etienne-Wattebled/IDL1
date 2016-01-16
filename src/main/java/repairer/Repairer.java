@@ -100,25 +100,20 @@ public class Repairer {
 		int i = 0;
 		URL url = null;
 		File dir = null;
+		URLClassLoader ucl = null;
 		
-		for (File f : this.target_testClassesFiles) {
-			try {
-				dir = f.getParentFile();
-				url = new URL("file://"+f.getAbsolutePath());
-				urls[i] = url;
-				i = i+1;
-			} catch (MalformedURLException me) {
-				me.printStackTrace();
-			}
-		}
-		URLClassLoader ucl = new URLClassLoader(urls);
 		i = 0;
 		for (File f : this.target_testClassesFiles) {
 			try {
-				classes[i] = ucl.loadClass(f.getAbsolutePath().replace(".class",""));
+				dir = f.getParentFile();
+				url = dir.toURI().toURL();
+				ucl = new URLClassLoader(new URL[] { url });
+				classes[i] = ucl.loadClass(f.getName());
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
+			} catch (MalformedURLException mue) {
+				mue.printStackTrace();
 			}
 		}
 		
