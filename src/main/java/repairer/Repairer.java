@@ -22,6 +22,7 @@ import org.junit.runner.Runner;
 import org.junit.runner.notification.RunNotifier;
 
 import metamutator.MutantSearchSpaceExplorator;
+import utils.PathUtils;
 
 public class Repairer {
 	private List<String> operatorNames;
@@ -88,7 +89,7 @@ public class Repairer {
 				dir = f.getParentFile();
 				url = dir.toURI().toURL();
 				ucl = new URLClassLoader(new URL[] { url });
-				classes[i] = ucl.loadClass(getPathAfter(f.getAbsolutePath(),Constants.TARGET_TESTCLASSES_PATH).replaceAll(".class","").replaceAll("//",".").replace("/","."));
+				classes[i] = ucl.loadClass(PathUtils.getPathAfter(PathUtils.getPathWithoutExtension(f.getAbsolutePath()),Constants.TARGET_TESTCLASSES_PATH).replaceAll(".class","").replace("/","."));
 				i = i+1;
 			} catch (ClassNotFoundException cnfe) {
 				cnfe.printStackTrace();
@@ -98,10 +99,6 @@ public class Repairer {
 		}
 		
 		return JUnitCore.runClasses(classes);
-	}
-	
-	public static String getPathAfter(String path, String flag) {
-		return path.substring(path.lastIndexOf(flag)+flag.length());
 	}
 	
 	private void resetOperatorNames() {
