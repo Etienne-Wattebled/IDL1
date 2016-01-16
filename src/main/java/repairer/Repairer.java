@@ -93,7 +93,7 @@ public class Repairer {
 				temp = f.getAbsolutePath();
 				temp = PathUtils.getPathWithoutExtension(temp);
 				temp = temp.replaceAll("/",".");
-				temp = temp.replaceAll("\\",".");
+				temp = temp.replaceAll("\\\\",".");
 				temp = PathUtils.getPathAfter(temp,Constants.TARGET_TESTCLASSES_PATH);
 				classes[i] = ucl.loadClass(temp);
 				i = i+1;
